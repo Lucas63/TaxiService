@@ -1,45 +1,127 @@
 import threading, time
 import random
-def my_threaded_func(arg, arg2):
-    print "Running thread! Args:", (arg, arg2)
-    time.sleep(10)
-    print "Done!"
+from bson.son import SON
+import numpy as np
+import math
+from pymongo import MongoClient
+import math_utils.math_utils
 
-#thread = threading.Thread(target=my_threaded_func, args=("I'ma", "thread"))
+
+
+#generates random order parameters
+def random_order(map_collection, client_collection, max_pass_amount):
+    map_size = map_collection.count()
+    rand_element = random.randint(0, map_size)
+    source = map_collection.find()[rand_element]
+    source_id = source['_id']
+    source_coord = [source['Latitude'],source['Longitude']]
+    rand_element = random.randint(0, map_size)
+    destination = map_collection.find()[rand_element]
+    destination_id = destination['_id']
+    destination_coord = [destination['Latitude'],destination['Longitude']]
+    clients_amount = client_collection.count()
+    rand_element = random.randint(0, clients_amount)
+    client_id = (client_collection.find()[rand_element])['_id']
+    pass_amount = random.randint(1,max_pass_amount)
+    return [source_coord, destination_coord, source_id, destination_id, client_id, pass_amount]
+
+def is_start():
+    t = random.randint(0, 100)
+    if t>50:
+        return True
+    return False
+
+
+
+#inserts order info in DB
+def insert_order(db, order, price, distance):
+    from db_utils.db_functions import insert_new_order
+    inserted_order = insert_new_order(db, order, price, distance)
+
+    return inserted_order.inserted_id
+
+#finds the best car according to rank and distance
+def find_car(db, order):
+    coordx = str(order[0][0])
+    coordy = str(order[0][1])
+
+    from db_utils.db_functions import get_nearest_driver
+    ans = get_nearest_driver(db, coordx, coordy)
+
+    from math_utils.math_utils import get_best_driver
+    driver = get_best_driver(np, ans)
+
+    return [driver['obj']['_id'], driver['dis']]
+
+
+# changes information about chosen car
+def start_trip(db, driver_id):
+
+    from db_utils.db_functions import update_driver_start_trip
+    update_driver_start_trip(db, driver_id)
+
+
+
+
+# inserts information about finished trip
+def end_trip(db, driver_id, order_id, order):
+    from db_utils.db_functions import update_driver_end_trip
+    update_driver_end_trip(db, driver_id, order_id, order)
+
+    from db_utils.db_functions import update_order_end_trip
+    update_order_end_trip(db, order_id, driver_id)
+
+
+def trip(db,collection,client_collection):
+    order = random_order(collection, client_collection, 4)
+    price, distance = math_utils.math_utils.calculate_trip_param(order)
+    order_id = insert_order(db, order, price, distance)
+    [driver_id, driver_dist] = find_car(db, order)
+    
+    from math_utils.math_utils import get_trip_length
+    trip_length = get_trip_length(driver_dist, distance)
+
+    start_trip(db, driver_id)
+    print "trip started"
+    print trip_length
+    time.sleep(trip_length)
+    end_trip(db, driver_id, order_id, order)
+    print str(trip_length) + "_done"
+
+
+client = MongoClient()
+db = client.taxidb
+collection = db.location
+client_collection = db.clients
+
+
+
+#trip(db,collection,client_collection)
+
+
+
+
+
+#thread = threading.Thread(target=trip, args=(db,collection,client_collection))
 #thread.start()
-#print "Spun off thread"
 
+tripsamount = 0
+pause_duration = 0.1
+trip_increment = 1
+trip_max_number = 100
 
-
-#db.getCollection('places').stats()
-#collection.stats()
-
-#for obj in collection.find():
-    #print obj['Latitude']
-
-#obj = next(result, None)
-#if obj:
-  #username= obj['username']
-  #print username
-
-
-
-"""
-from pymongo import MongoClient
-
-#client = MongoClient('...', 27017)
-client = MongoClient()
-db = client.places
-#db = client['...']
-collection = db.places
-#collection = db["..."]
-#result = collection.find()
-
-stats = collection.count()
-print stats
-
-print db.command("collstats", "places")
-"""
+while True:
+    if tripsamount < trip_max_number:
+        if (is_start()):
+            thread = threading.Thread(target=trip, args=(db, collection, client_collection))
+            thread.start()
+            time.sleep(pause_duration)
+            tripsamount += trip_increment
+        else:
+            print "trip not started"
+            time.sleep(pause_duration)
+    else:
+        break
 
 
 
@@ -49,19 +131,3 @@ print db.command("collstats", "places")
 
 
 
-
-
-
-
-
-def generate_order(collection):
-    map_size = collection.count()
-    print random.randint(0, map_size)
-    #coordinates = collection.
-
-
-from pymongo import MongoClient
-client = MongoClient()
-db = client.places
-collection = db.places
-generate_order(collection)
