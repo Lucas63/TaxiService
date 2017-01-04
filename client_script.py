@@ -3,8 +3,8 @@ import random
 from bson.son import SON
 import numpy as np
 import math
-from pymongo import MongoClient
 import math_utils.math_utils
+from pymongo import MongoClient
 
 
 
@@ -56,7 +56,6 @@ def find_car(db, order):
 
 # changes information about chosen car
 def start_trip(db, driver_id):
-
     from db_utils.db_functions import update_driver_start_trip
     update_driver_start_trip(db, driver_id)
 
@@ -89,44 +88,15 @@ def trip(db,collection,client_collection):
     print str(trip_length) + "_done"
 
 
-client = MongoClient()
-db = client.taxidb
-collection = db.location
-client_collection = db.clients
+def single_trip():
+    client = MongoClient()
+    db = client.taxidb
+    collection = db.location
+    client_collection = db.clients
+    trip(db,collection,client_collection)
 
 
-
-#trip(db,collection,client_collection)
-
-
-
-
-
-#thread = threading.Thread(target=trip, args=(db,collection,client_collection))
-#thread.start()
-
-tripsamount = 0
-pause_duration = 0.1
-trip_increment = 1
-trip_max_number = 100
-
-while True:
-    if tripsamount < trip_max_number:
-        if (is_start()):
-            thread = threading.Thread(target=trip, args=(db, collection, client_collection))
-            thread.start()
-            time.sleep(pause_duration)
-            tripsamount += trip_increment
-        else:
-            print "trip not started"
-            time.sleep(pause_duration)
-    else:
-        break
-
-
-
-
-
+single_trip()
 
 
 
