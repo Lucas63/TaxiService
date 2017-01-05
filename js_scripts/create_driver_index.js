@@ -1,0 +1,1 @@
+db.driver.createIndex({location:"2dsphere"})

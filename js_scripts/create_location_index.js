@@ -1,0 +1,1 @@
+db.location.createIndex({location:"2dsphere"})
