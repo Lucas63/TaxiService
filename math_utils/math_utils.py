@@ -1,6 +1,9 @@
 import math
 
 
+
+
+
 def calculate_trip_param(order):
     distance = 1000*distance_on_unit_sphere(order[0][0],order[0][1],order[1][0],order[1][1])
     price = max(40, (25 + 5 * distance / 1000))

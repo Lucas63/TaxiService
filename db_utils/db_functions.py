@@ -1,3 +1,13 @@
+from pymongo import MongoClient
+global client
+client = MongoClient()
+global db
+db = client.taxidb
+global collection
+collection = db.location
+global client_collection
+client_collection = db.clients
+
 
 
 
@@ -58,8 +68,8 @@ def insert_new_order(db, order, price, distance):
     return inserted_order
 
 
-def get_nearest_driver(db, coordx, coordy):
-    return db.eval("get_drivers(" + coordx + ", " + coordy + ")")
+def get_nearest_driver(db, coordx, coordy,driversamount,max_distance):
+    return db.eval("get_drivers(" + coordy + ", " + coordx + ", " + max_distance + ", " + driversamount + ")")
 
 
 
