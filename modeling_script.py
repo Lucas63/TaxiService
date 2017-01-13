@@ -26,6 +26,7 @@ def start_modeling(tripsamount, pause_duration, trip_increment, trip_max_number)
 
 
 
+
 #timex = time.time()
 tripsamount = 0
 pause_duration = 0.1
