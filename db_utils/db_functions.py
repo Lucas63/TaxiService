@@ -20,6 +20,15 @@ def update_driver_start_trip(db, driver_id):
         }
     }, upsert=False)
 
+def update_driver_move_to_client(db, driver_id):
+    db.driver.update_one({
+        '_id': driver_id
+    }, {
+        '$set': {
+            'is_free': 2
+        }
+    }, upsert=False)
+
 
 # TODO: merge functions
 def update_driver_end_trip(db, driver_id, order_id, order):

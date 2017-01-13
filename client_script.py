@@ -60,7 +60,7 @@ def find_car(db, order):
 
     while True:
         ans = get_nearest_driver(db, coordx, coordy,driversamount,max_distance)
-        print (len(ans['results']))
+        #print (len(ans['results']))
         if len(ans['results']) > 0:
             break
         time.sleep(1)
@@ -77,7 +77,10 @@ def start_trip(db, driver_id):
     from db_utils.db_functions import update_driver_start_trip
     update_driver_start_trip(db, driver_id)
 
-
+# changes information about chosen car
+def move_to_passanger(db, driver_id):
+    from db_utils.db_functions import update_driver_move_to_client
+    update_driver_move_to_client(db, driver_id)
 
 
 # inserts information about finished trip
@@ -88,7 +91,7 @@ def end_trip(db, driver_id, order_id, order):
     from db_utils.db_functions import update_order_end_trip
     update_order_end_trip(db, order_id, driver_id)
 
-#TODO: trip status moving to client
+#DONE: trip status moving to client
 def trip():
     """
     order = random_order(collection, client_collection, 4)
@@ -116,14 +119,20 @@ def trip():
     # TODO: distance from mongo function
     [driver_id, driver_dist] = find_car(db_utils.db_functions.db, order)
 
-    from math_utils.math_utils import get_trip_length
-    trip_length = get_trip_length(driver_dist, distance)
-
-    start_trip(db_utils.db_functions.db, driver_id)
-    # print "trip started"
+    from math_utils.math_utils import get_trip_to_pass
+    trip_length = get_trip_to_pass(driver_dist)
+    move_to_passanger(db_utils.db_functions.db, driver_id)
     print trip_length
-
     time.sleep(trip_length * minute_length)
+
+
+    from math_utils.math_utils import get_trip_with_pass
+    trip_length = get_trip_with_pass(distance)
+    start_trip(db_utils.db_functions.db, driver_id)
+    print trip_length
+    time.sleep(trip_length * minute_length)
+
+
     end_trip(db_utils.db_functions.db, driver_id, order_id, order)
     print str(trip_length) + "_done"
 
@@ -132,11 +141,11 @@ def single_trip():
     db = client.taxidb
     collection = db.location
     client_collection = db.clients
-    trip(db,collection,client_collection)
+    trip()
 
 
 
-
+#single_trip()
 
 
 
