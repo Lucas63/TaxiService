@@ -136,6 +136,7 @@ def trip():
     end_trip(db_utils.db_functions.db, driver_id, order_id, order)
     print str(trip_length) + "_done"
 
+
 def single_trip():
     client = MongoClient()
     db = client.taxidb
