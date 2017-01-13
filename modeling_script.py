@@ -8,7 +8,6 @@ def start_modeling(tripsamount, pause_duration, trip_increment, trip_max_number)
     #trip(db,collection,client_collection)
     #thread = threading.Thread(target=trip, args=(db,collection,client_collection))
     #thread.start()
-
     while True:
         if tripsamount < trip_max_number:
             if (client_script.is_start()):

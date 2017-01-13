@@ -8,6 +8,7 @@ collection = db.location
 global client_collection
 client_collection = db.clients
 
+logfile = open('log.txt', "a")
 
 
 
@@ -81,8 +82,19 @@ def get_nearest_driver(db, coordx, coordy,driversamount,max_distance):
     return db.eval("get_drivers(" + coordy + ", " + coordx + ", " + max_distance + ", " + driversamount + ")")
 
 
+def get_pass_by_id(_id, db):
+    ans = db.clients.find_one({"_id": _id})
+    if ans == None:
+        return ans
+    else:
+        return str(ans['Name']), ans['Telephone']
 
-
+def get_district_by_id(_id, db):
+    ans = db.location.find_one({"_id": _id})
+    if ans == None:
+        return ans
+    else:
+        return ans['District']
 
 
 #initial functions

@@ -1,5 +1,5 @@
 import math
-
+import random
 
 
 
@@ -35,7 +35,20 @@ def get_trip_length(driver_dist, distance):
     return (driver_dist / 1000 + distance) / 1000
 
 def get_trip_to_pass(driver_dist):
-    return (driver_dist / 1000) / 1000
+    return (driver_dist ) / 1000
 
 def get_trip_with_pass(distance):
     return (distance) / 1000
+
+def generate_rank():
+    t = random.randint(0, 100)
+    #print t
+    if t>50:
+        return 5
+    if t > 25:
+        return 4
+    if t > 10:
+        return 3
+    if t > 5:
+        return 2
+    return 1

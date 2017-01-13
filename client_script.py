@@ -116,13 +116,12 @@ def trip():
     price, distance = math_utils.math_utils.calculate_trip_param(order)
     order_id = insert_order(db_utils.db_functions.db, order, price, distance)
 
-    # TODO: distance from mongo function
     [driver_id, driver_dist] = find_car(db_utils.db_functions.db, order)
 
     from math_utils.math_utils import get_trip_to_pass
     trip_length = get_trip_to_pass(driver_dist)
     move_to_passanger(db_utils.db_functions.db, driver_id)
-    print trip_length
+    #print trip_length
     time.sleep(trip_length * minute_length)
 
 
@@ -136,6 +135,19 @@ def trip():
     end_trip(db_utils.db_functions.db, driver_id, order_id, order)
     print str(trip_length) + "_done"
 
+    from db_utils.db_functions import get_pass_by_id
+    pass_name, pass_phone = get_pass_by_id(order[4],db_utils.db_functions.db)
+
+    from db_utils.db_functions import get_district_by_id
+    srcdistrict = get_district_by_id(order[2],db_utils.db_functions.db).replace(' ', '_')
+    destdistrict = get_district_by_id(order[3],db_utils.db_functions.db).replace(' ', '_')
+
+    from math_utils.math_utils import generate_rank
+    log = "pass_name:"+ pass_name.replace(' ', '_')+",pass_phone:"+str(pass_phone)+",srclat:" + str(order[0][0])+",srclong:" + str(order[0][1])+",destlat:" + str(order[1][0])+",destlong:" + str(order[1][1])+",srcdistrict:" + srcdistrict+",destdistrict:" + destdistrict+",driverid:" + str(driver_id)+",distance:" + str(driver_dist+distance)+",rank:" + str(generate_rank())+'\n'
+    #print log
+    from db_utils.db_functions import logfile
+    logfile.write(log)
+
 
 def single_trip():
     client = MongoClient()
@@ -145,8 +157,8 @@ def single_trip():
     trip()
 
 
-
-#single_trip()
+#logfile = open('log.txt', "a")
+#single_trip(logfile)
 
 
 
